@@ -28,11 +28,12 @@ ForEach($script in $ScriptsToInstall)
 	$currScript = $script;
 	$currScriptORIG = $currScript;
     $currScriptPath = ($BaseFolder + "\" + $currScriptORIG);
-    $currScriptPath;
-
+    
     #Run SQL scripts.
     Invoke-DbaSqlQuery -SqlInstance $ServerName -Database $DBName -File $currScriptPath
 
+    #Show file running at host.
+    Write-Host $currScriptPath;
     #Log.
 	"***** $currScript ***** $([Environment]::NewLine)" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
 
@@ -42,5 +43,7 @@ ForEach($script in $ScriptsToInstall)
 #Move PowerShell inventory and accompanying Fuction scripts.
 Copy-Item $PSScriptRoot\PS -Destination $Destination -Recurse -Force;
 
+#Show action at host.
+Write-Host "Copying $PSScriptRoot\PS to $Destination."
 #Log.
-"***** Move $PSScriptRoot\PS to $Destination ***** $([Environment]::NewLine)" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
+"***** Coping $PSScriptRoot\PS to $Destination ***** $([Environment]::NewLine)" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
