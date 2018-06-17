@@ -1,6 +1,7 @@
 ﻿param(
     $ServerName = 'localhost',
-    $DBName = 'master'
+    $DBName = 'master',
+    $Destination = 'C:\'
 )
 
 <#
@@ -20,7 +21,8 @@ $ScriptsToInstall = Get-Content $BaseFolder\InstallOrder.txt;
 	"################## $ServerName ###################" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
 	"##################################################" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
 
-$ScriptsToInstall | ForEach-Object{
+$ScriptsToInstall | ForEach-Object
+{
 	$currScript = $_;
 	$currScriptORIG = $currScript;
     $currScriptPath = ($BaseFolder + "\" + $currScriptORIG);
@@ -33,3 +35,10 @@ $ScriptsToInstall | ForEach-Object{
 	"***** $currScript ***** $([Environment]::NewLine)" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
 
 } #$ScriptsToInstall
+
+
+#Move PowerShell inventory and accompanying Fuction scripts.
+Copy-Item -Path $PSScriptRoot -Destination $Destination -Recurse -Force;
+
+#Log.
+"***** Move $PSScriptRoot\PS to $Destination ***** $([Environment]::NewLine)" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
