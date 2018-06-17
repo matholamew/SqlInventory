@@ -29,13 +29,17 @@ BEGIN TRANSACTION
 	EXEC @ReturnCode = msdb.dbo.sp_add_schedule  
 	--EXEC msdb.dbo.sp_add_schedule
 	    @schedule_name = N'Daily - 12:05am',
-	    @enabled = 1,
-	 @freq_type = 8,  
-	    @freq_interval = 64, 
-	 @freq_recurrence_factor = 1, 
-	 @active_start_date=20170729,
-	    @active_start_time = 010000,
-	 @freq_subday_type = 1,
+	    @enabled=1, 
+		@freq_type=4, 
+		@freq_interval=1, 
+		@freq_subday_type=1, 
+		@freq_subday_interval=12, 
+		@freq_relative_interval=0, 
+		@freq_recurrence_factor=0, 
+		@active_start_date=20160824, 
+		@active_end_date=99991231, 
+		@active_start_time=000500, 
+		@active_end_time=235959,
 	 @schedule_uid = @scheduleuid OUTPUT  
 	IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 	
@@ -46,7 +50,7 @@ BEGIN TRANSACTION
 	-- Add the job.
 	DECLARE @jobId uniqueidentifier
 	EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'Collection-SQLServerInventory', 
-	  @enabled=1, 
+	  @enabled=0, 
 	  @notify_level_eventlog=0, 
 	  @notify_level_email=0, 
 	  @notify_level_netsend=0, 
@@ -63,9 +67,9 @@ BEGIN TRANSACTION
 	EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Run PowerShell script', 
 		@step_id=1, 
 		@cmdexec_success_code=0, 
-		@on_success_action=3, 
+		@on_success_action=1, 
 		@on_success_step_id=0, 
-		@on_fail_action=3, 
+		@on_fail_action=2, 
 		@on_fail_step_id=0, 
 		@retry_attempts=0, 
 		@retry_interval=0, 
@@ -82,7 +86,7 @@ BEGIN TRANSACTION
 	-----------------------------------------------------------------------------------------
 	
 	EXEC @ReturnCode = msdb.dbo.sp_attach_schedule  
-	   @job_name = N'Insert into JobRunLog table with a schedule',  
+	   @job_name = N'Collection-SQLServerInventory',  
 	   @schedule_name = N'Daily - 12:05am' 
 	
 	-----------------------------------------------------------------------------------------
