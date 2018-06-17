@@ -8,13 +8,18 @@ The folder can be placed anywhere.
 
 2) Unblock files
 Before continuing with the install you must unblock the files. Windows blocks files when you download
-them from the internet, so the first time you run this you’ll need to unblock them. Open a PowerShell
+them from the internet, so the first time you run this youï¿½ll need to unblock them. Open a PowerShell
 window and navigate to the installation folder. Type in 'dir -recurse | unblock-file'.
 
 3) Installation
 This installer is designed to install on a single location. Open a PowerShell window and
 navigate to the installation folder if you have not already done so. Type in
-'. .\Setup-SQLInventory.ps1 -ServerName "Server -DBName "Database"'.
+'. .\Setup-SQLInventory.ps1 -ServerName "Server -DBName "Database" -Destination "X:\"'.
+
+4) Post installation
+Open the SQL job called 'Collection-SQLServerInventory'. Edit Step 1 of the job and set the path for
+the PowerShell script from 'X:\Path\Get-SQLServerInventory.ps1' to the location of the
+'Get-SQLServerInventory.ps1 file'.
 
 
 Folders:
@@ -22,11 +27,15 @@ Folders:
 Holds the txt files from each install. Format 'YYYYMMDD_HHMMSS.txt'.
 
 2) Scripts
-Holds the sql files for creating database objects including schema and tables. Also contains 'InstallOrder.txt'
-which is a list of the files to be run.
+Holds the sql files for creating database objects including schema and tables. Also contains 
+InstallOrder.txt' which is a list of the files to be run.
+
+3) PS
+Do NOT alter this directory in any way. This directory will copy over to the Destination variable
+that is set during the install.
 
 
-Customizing the install:
+Customizing the install further:
 1) Create and save your script into the Scripts folder.
 
 2) Add the name of that script into the 'InstallOrder.txt' file.
