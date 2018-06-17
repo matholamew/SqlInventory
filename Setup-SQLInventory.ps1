@@ -11,19 +11,21 @@
 #Import dbatools module.
 Import-Module dbatools;
 
+$ErrorActionPreference = "Stop";
+
 $LogDate = (Get-Date -format "yyyyMMdd_HHmmss");
 $BaseFolder = (Get-ChildItem | Where-Object{ $_.PsIsContainer -eq $true } | Sort-Object -Property name -Descending | Select-Object -First 1 -Property FullName).FullName;
 $ScriptBase = $PSScriptRoot;
-$ScriptBase;
+#$ScriptBase;
 $ScriptsToInstall = Get-Content $BaseFolder\InstallOrder.txt;
 
 	"##################################################" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
 	"################## $ServerName ###################" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
 	"##################################################" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
 
-$ScriptsToInstall | ForEach-Object
+ForEach($script in $ScriptsToInstall)
 {
-	$currScript = $_;
+	$currScript = $script;
 	$currScriptORIG = $currScript;
     $currScriptPath = ($BaseFolder + "\" + $currScriptORIG);
     $currScriptPath;
@@ -38,7 +40,7 @@ $ScriptsToInstall | ForEach-Object
 
 
 #Move PowerShell inventory and accompanying Fuction scripts.
-Copy-Item -Path $PSScriptRoot -Destination $Destination -Recurse -Force;
+Copy-Item $PSScriptRoot\PS -Destination $Destination -Recurse -Force;
 
 #Log.
 "***** Move $PSScriptRoot\PS to $Destination ***** $([Environment]::NewLine)" | Out-File $ScriptBase\InstallLog\$LogDate.txt -Append;
