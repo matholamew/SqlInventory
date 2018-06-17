@@ -17,9 +17,9 @@ navigate to the installation folder if you have not already done so. Type in
 '. .\Setup-SQLInventory.ps1 -ServerName "Server -DBName "Database" -Destination "X:\"'.
 
 4) Post installation
-Open the SQL job called 'Collection-SQLServerInventory'. Edit Step 1 of the job and set the path for
-the PowerShell script from 'X:\Path\Get-SQLServerInventory.ps1' to the location of the
-'Get-SQLServerInventory.ps1 file'.
+Open the SQL job called 'Collection-SQLServerInventory'. Edit Step 1 of the job and set the command
+to the location of the 'Get-SQLServerInventory.ps1' file. For example: PowerShell -File "C:\PS\Get-SQLServerInventory.ps1"
+This job is set to disabled by default, enable it once you are ready.
 
 
 Folders:
