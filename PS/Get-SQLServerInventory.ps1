@@ -1,13 +1,13 @@
 ﻿#Collects all Server information into DBManagement database.
 #Including:
-#     DemoSystemInfo;
-#     DemoOSInfo;
-#     DemoMemoryInfo;
-#     DemoDiskInfo;
-#     DemoDatabaseFileSize; (not tempdb)
-#     DemoLastSQLBackup;
-#     DemoSQLServerInfo;
-#     DemoLogShippingErrors;
+#     SystemInfo;
+#     OSInfo;
+#     MemoryInfo;
+#     DiskInfo;
+#     DatabaseFileSize; (not tempdb)
+#     LastSQLBackup;
+#     SQLServerInfo;
+#     LogShippingErrors;
 
 #Import dbatools module.
 Import-Module dbatools;
@@ -18,7 +18,7 @@ Set-Location 'C:\PS\Collection\Functions';
 #Local variables for gathering server names to inventory.
 [string]$SQLInstance = "WINSYS1612DEV\INST1";
 [string]$Database = "DBManagement";
-[string]$Schema = "dbo";
+[string]$Schema = "Inventory";
 [string]$Environment = "Demo";
 [datetime]$ExecutionDateTime = (Get-Date -Format "%d/MMM/yyyy %H:mm:ss");
 
@@ -31,11 +31,11 @@ Function Get-CollectionInfo ($svr) {
     #Remove Instance from Server Name.
     If ($svr.Contains(“\”)) {$srvShort = $svr.Split("\")[0]};
 
-    #DemoSystemInfo
+    #SystemInfo
         #Begin
 
             #Table name.
-            $Table = "DemoSystemInfo";
+            $Table = "SystemInfo";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
@@ -52,13 +52,13 @@ Function Get-CollectionInfo ($svr) {
                                             @{n="NumberOfCores";e={$_.NumberLogicalProcessors}}, SystemType, @{n="TotalPhysicalMemory";e={$_.TotalPhysicalMemory.Byte}}, `
                                             @{n="ExecutionDate";e={$ExecutionDateTime}} | ConvertTo-DbaDataTable | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
         
-        #End DemoSystemInfo
+        #End SystemInfo
 
-    #DemoOSInfo
+    #OSInfo
         #Begin
 
             #Table name.
-            $Table = "DemoOSInfo";
+            $Table = "OSInfo";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
@@ -71,13 +71,13 @@ Function Get-CollectionInfo ($svr) {
             $Data = $System | Select-Object @{n="ServerName";e={$svr}}, @{n="OSName";e={$OSName}}, Version, OSLanguage, OSProductSuite, OSType, ServicePackMajorVersion, ServicePackMinorVersion, `
                                             @{n="ExecutionDate";e={$ExecutionDateTime}} | ConvertTo-DbaDataTable | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
                        
-        #End DemoOSInfo
+        #End OSInfo
 
-    #DemoMemoryInfo
+    #MemoryInfo
         #Begin
 
             #Table name.
-            $Table = "DemoMemoryInfo";
+            $Table = "MemoryInfo";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
@@ -88,13 +88,13 @@ Function Get-CollectionInfo ($svr) {
             $Data = $System | Select-Object @{n="ServerName";e={$svr}},Name, Capacity, DeviceLocator, Tag, @{n="ExecutionDate";e={$ExecutionDateTime}} | ConvertTo-DbaDataTable `
                                     | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
                        
-        #End DemoMemoryInfo
+        #End MemoryInfo
 
-    #DemoDiskInfo
+    #DiskInfo
         #Begin
 
             #Table name.
-            $Table = "DemoDiskInfo";
+            $Table = "DiskInfo";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
@@ -106,13 +106,13 @@ Function Get-CollectionInfo ($svr) {
             $Data = $System | Select-Object @{n="ServerName";e={$svr}}, Name, Label, DriveLetter, Capacity, FreeSpace, @{n="ExecutionDate";e={$ExecutionDateTime}} `
                                     | ConvertTo-DbaDataTable | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
                        
-        #End DemoDiskInfo
+        #End DiskInfo
 
-    #DemoDatabaseFileSizes
+    #DatabaseFileSizes
         #Begin
 
             #Table name.
-            $Table = "DemoDatabaseFileSizes";
+            $Table = "DatabaseFileSizes";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
@@ -124,13 +124,13 @@ Function Get-CollectionInfo ($svr) {
                                             @{n="FreeSpace";e={$_.AvailableSpace.Byte}}, ID, @{n="ExecutionDate";e={$ExecutionDateTime}} `
                                     | ConvertTo-DbaDataTable | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
                        
-        #End DemoDatabaseFileSizes
+        #End DatabaseFileSizes
 
-    #DemoLastSQLBackup
+    #LastSQLBackup
         #Begin
 
             #Table name.
-            $Table = "DemoLastSQLBackup";
+            $Table = "LastSQLBackup";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
@@ -141,39 +141,39 @@ Function Get-CollectionInfo ($svr) {
             $Data = $System | Select-Object @{n="ServerName";e={$svr}}, Database, RecoveryModel, LastFullBackup, LastDiffBackup, LastLogBackup, @{n="ExecutionDate";e={$ExecutionDateTime}} `
                                     | ConvertTo-DbaDataTable | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
                        
-        #End DemoLastSQLBackup
+        #End LastSQLBackup
 
-    #DemoSQLServerInfo
+    #SQLServerInfo
         #Begin
 
             #Table name.
-            $Table = "DemoSQLServerInfo";
+            $Table = "SQLServerInfo";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
 
-            $System = Get-SQLInstance -Computername $svrShort
-            $Version = Get-DbaSqlBuildReference -SqlInstance $svr
+            $System = (Get-SQLInstance -Computername $svrShort)
+            $Version = (Get-DbaSqlBuildReference -SqlInstance $svr -Update)
 
             #Format final output and write to table.
             $Data = $System | Select-Object @{n="ServerName";e={$svr}}, Instance, FullName, Caption, Skuname, Instanceid, @{n="Version";e={$Version.Build}}, Splevel, Clustered, InstallPath, `
                                             DataPath, Dumpdir, BackupDirectory , Startupparameters, @{n="ExecutionDate";e={$ExecutionDateTime}} | ConvertTo-DbaDataTable `
                                     | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
                        
-        #End DemoSQLServerInfo
+        #End SQLServerInfo
     
-    #DemoLogShippingErrors
+    #LogShippingErrors
         #Begin
 
             #Table name.
-            $Table = "DemoLogShippingErrors";
+            $Table = "LogShippingErrors";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
             
             #Get the list of servers to inventory.
             $LogQuery = "SELECT DISTINCT ServerName
-                            FROM DemoServers
+                            FROM Inventory.Servers
                             WHERE ServerName = '$svr'
                                 and (LogShippingPrimaryID IS NOT NULL)"
             $LogServers = Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $LogQuery;
@@ -188,22 +188,22 @@ Function Get-CollectionInfo ($svr) {
                                          | ConvertTo-DbaDataTable | Write-DbaDataTable -SqlServer $SQLInstance -Database $Database -Table $FullTable;
 
             }
-        #End DemoLogShippingErrors
+        #End LogShippingErrors
 
-    #Update DemoServers with ExecutionDate
+    #Update Servers with ExecutionDate
         #Begin
             
             #Table name.
-            $Table = "DemoServers";
+            $Table = "Servers";
             $FullTable = "$Schema.$Table"
             #Output
             "$Table, "
 
             $query = "UPDATE $FullTable
-                        SET ExecutionDate = '$ExecutionDateTime'
+                        SET ExecutionDateTime = '$ExecutionDateTime'
                         WHERE ServerName IN ('$svr')"
             Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
-        #End DemoServers
+        #End Servers
 
     #Output for SQL job history.
     "End gathering for $($svr)."
@@ -212,21 +212,21 @@ Function Get-CollectionInfo ($svr) {
 
 #---------------------------------------------------------------------------------------------------------------------------------------#
 #Clean out all tables pre-run.
-$query = "SELECT ServerName into #cmm from DemoServers where Environment in ('$Environment');
-            DELETE FROM DemoOSInfo WHERE ServerName in (Select ServerName from #cmm);
-            DELETE FROM DemoMemoryInfo WHERE ServerName in (Select ServerName from #cmm);
-            DELETE FROM DemoDiskInfo WHERE ServerName in (Select ServerName from #cmm) AND ExecutionDate <= DATEADD(dd, -730, GETDATE());
-            DELETE FROM DemoSystemInfo WHERE ServerName in (Select ServerName from #cmm);
-            DELETE FROM DemoDatabaseFileSizes WHERE Servername in (Select ServerName from #cmm) AND ExecutionDate <= DATEADD(dd, -730, GETDATE());
-            DELETE FROM DemoLastSQLBackup WHERE ServerName in (Select ServerName from #cmm);
-            DELETE FROM DemoSQLServerInfo WHERE ServerName in (Select ServerName from #cmm);
-            DELETE FROM DemoLogShippingErrors WHERE ServerName in (Select ServerName from #cmm) AND ExecutionDate <= DATEADD(dd, -60, GETDATE());"
+$query = "SELECT DISTINCT ServerName into #cmm FROM Inventory.Servers where Environment in ('$Environment');
+            DELETE FROM Inventory.OSInfo WHERE ServerName in (Select ServerName from #cmm);
+            DELETE FROM Inventory.MemoryInfo WHERE ServerName in (Select ServerName from #cmm);
+            DELETE FROM Inventory.DiskInfo WHERE ServerName in (Select ServerName from #cmm) AND ExecutionDateTime <= DATEADD(dd, -730, GETDATE());
+            DELETE FROM Inventory.SystemInfo WHERE ServerName in (Select ServerName from #cmm);
+            DELETE FROM Inventory.DatabaseFileSizes WHERE Servername in (Select ServerName from #cmm) AND ExecutionDateTime <= DATEADD(dd, -730, GETDATE());
+            DELETE FROM Inventory.LastSQLBackup WHERE ServerName in (Select ServerName from #cmm);
+            DELETE FROM Inventory.SQLServerInfo WHERE ServerName in (Select ServerName from #cmm);
+            DELETE FROM Inventory.LogShippingErrors WHERE ServerName in (Select ServerName from #cmm) AND ExecutionDateTime <= DATEADD(dd, -60, GETDATE());"
 Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
 
 
 #Get the list of servers to inventory.
 $query = "SELECT DISTINCT ServerName
-            FROM DemoServers WHERE Environment IN ('$Environment')"
+            FROM Inventory.Servers WHERE Environment IN ('$Environment')"
 $servers = Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
 
 #Run the collection for each server.

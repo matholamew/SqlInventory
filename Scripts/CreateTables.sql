@@ -21,6 +21,25 @@ CREATE TABLE [Inventory].[Servers](
 ) ON [PRIMARY]
 GO
 
+--DiskInfo
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE name = 'DiskInfo' and SCHEMA_NAME(schema_id) = 'Inventory')
+CREATE TABLE [Inventory].[DiskInfo](
+	[ServerName] [nvarchar](128) NOT NULL,
+	[DiskName] [varchar](50) NULL,
+	[Label] [varchar](50) NULL,
+	[DriveLetter] [varchar](5) NULL,
+	[Capacity] [float] NULL,
+	[FreeSpace] [float] NULL,
+	[ExecutionDateTime] [datetime] NULL
+) ON [PRIMARY]
+GO
+
+
 --DatabaseFileSizes
 SET ANSI_NULLS ON
 GO
@@ -141,5 +160,32 @@ CREATE TABLE [Inventory].[SQLServerInfo](
 	[SQLStartupParams] [nvarchar](500) NOT NULL,
 	[ExecutionDateTime] [datetime] NOT NULL
 ) ON [PRIMARY]
+GO
 
+--SystemInfo
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE name = 'SystemInfo' and SCHEMA_NAME(schema_id) = 'Inventory')
+CREATE TABLE [Inventory].[SystemInfo](
+	[ServerName] [nvarchar](128) NOT NULL,
+	[Model] [varchar](200) NULL,
+	[Manufacturer] [varchar](50) NULL,
+	[Description] [varchar](100) NULL,
+	[DNSHostName] [varchar](30) NULL,
+	[Domain] [varchar](30) NULL,
+	[DomainRole] [smallint] NULL,
+	[PartOfDomain] [varchar](5) NULL,
+	[NumberOfProcessors] [smallint] NULL,
+	[NumberOfCores] [smallint] NULL,
+	[SystemType] [varchar](50) NULL,
+	[TotalPhysicalMemory] [float] NULL,
+	[ExecutionDateTime] [datetime] NULL,
+ CONSTRAINT [PK_Server_Name] PRIMARY KEY CLUSTERED 
+(
+	[ServerName] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
 GO
