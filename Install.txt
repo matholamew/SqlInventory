@@ -14,12 +14,14 @@ window and navigate to the installation folder. Type in 'dir -recurse | unblock-
 3) Installation
 This installer is designed to install on a single location. Open a PowerShell window and
 navigate to the installation folder if you have not already done so. Type in
-'. .\Setup-SQLInventory.ps1 -ServerName "Server -DBName "Database" -Destination "X:\"'.
+'. .\Setup-SQLInventory.ps1 -ServerName "Server" -DBName "Database" -Destination "X:\"'.
 
 4) Post installation
 Open the SQL job called 'Collection-SQLServerInventory'. Edit Step 1 of the job and set the command
 to the location of the 'Get-SQLServerInventory.ps1' file. For example: PowerShell -File "C:\PS\Get-SQLServerInventory.ps1"
 This job is set to disabled by default, enable it once you are ready.
+
+*Also requires dbatools. See website for documentation and installation instructions.
 
 
 Folders:
@@ -28,7 +30,7 @@ Holds the txt files from each install. Format 'YYYYMMDD_HHMMSS.txt'.
 
 2) Scripts
 Holds the sql files for creating database objects including schema and tables. Also contains 
-InstallOrder.txt' which is a list of the files to be run.
+'InstallOrder.txt' which is a list of the files to be run.
 
 3) PS
 Do NOT alter this directory in any way. This directory will copy over to the Destination variable
