@@ -117,7 +117,7 @@ Function Get-CollectionInfo ($svr) {
             #Output
             "$Table, "
 
-            $System = Get-DbaDatabaseFile -SqlInstance $svr | Where-Object Database -NotMatch "tempdb"
+            $System = Get-DbaDbFile -SqlInstance $svr | Where-Object Database -NotMatch "tempdb"
 
             #Format final output and write to table.
             $Data = $System | Select-Object @{n="ServerName";e={$svr}}, Database, LogicalName, PhysicalName, @{n="TotalSize";e={$_.Size.Byte}}, @{n="UsedSpace";e={$_.UsedSpace.Byte}}, `
@@ -153,7 +153,7 @@ Function Get-CollectionInfo ($svr) {
             "$Table, "
 
             $System = (Get-SQLInstance -Computername $svrShort)
-            $Version = (Get-DbaSqlBuildReference -SqlInstance $svr -Update)
+            $Version = (Get-DbaBuildReference -SqlInstance $svr -Update)
 
             #Format final output and write to table.
             $Data = $System | Select-Object @{n="ServerName";e={$svr}}, Instance, FullName, Caption, Skuname, Instanceid, @{n="Version";e={$Version.Build}}, Splevel, Clustered, InstallPath, `
@@ -176,7 +176,7 @@ Function Get-CollectionInfo ($svr) {
                             FROM Inventory.Servers
                             WHERE ServerName = '$svr'
                                 and (LogShippingPrimaryID IS NOT NULL)"
-            $LogServers = Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $LogQuery;
+            $LogServers = Invoke-DbaQuery -SqlInstance $SQLInstance -Database $Database -Query $LogQuery;
 
             #Run the collection for each server.
             ForEach($LogSvr in $LogServers.ServerName){
@@ -202,7 +202,7 @@ Function Get-CollectionInfo ($svr) {
             $query = "UPDATE $FullTable
                         SET ExecutionDateTime = '$ExecutionDateTime'
                         WHERE ServerName IN ('$svr')"
-            Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
+            Invoke-DbaQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
         #End Servers
 
     #Output for SQL job history.
@@ -221,13 +221,13 @@ $query = "SELECT DISTINCT ServerName into #cmm FROM Inventory.Servers where Envi
             DELETE FROM Inventory.LastSQLBackup WHERE ServerName in (Select ServerName from #cmm);
             DELETE FROM Inventory.SQLServerInfo WHERE ServerName in (Select ServerName from #cmm);
             DELETE FROM Inventory.LogShippingErrors WHERE ServerName in (Select ServerName from #cmm) AND ExecutionDateTime <= DATEADD(dd, -60, GETDATE());"
-Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
+Invoke-DbaQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
 
 
 #Get the list of servers to inventory.
 $query = "SELECT DISTINCT ServerName
             FROM Inventory.Servers WHERE Environment IN ('$Environment')"
-$servers = Invoke-DbaSqlQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
+$servers = Invoke-DbaQuery -SqlInstance $SQLInstance -Database $Database -Query $query;
 
 #Run the collection for each server.
 ForEach($svr in $servers){
